@@ -1,34 +1,19 @@
 {
   "name": "Ce soir on mange",
   "short_name": "Ce soir",
-  "description": "Décide ce qu'on mange ce soir en quelques secondes",
-  "start_url": "/",
-  "scope": "/",
+  "description": "Décide quoi manger ce soir en quelques secondes",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
   "theme_color": "#2E6A4C",
   "background_color": "#F3F5EF",
-  "categories": ["food", "lifestyle"],
+  "prefer_related_applications": false,
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%232E6A4C' width='192' height='192'/><circle cx='96' cy='96' r='40' fill='white'/></svg>",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%232E6A4C' width='192' height='192'/%3E%3Ccircle cx='96' cy='96' r='40' fill='white'/%3E%3C/svg%3E",
       "sizes": "192x192",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%232E6A4C' width='512' height='512'/><circle cx='256' cy='256' r='100' fill='white'/></svg>",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='%23F3F5EF' width='540' height='720'/><rect fill='%232E6A4C' width='540' height='100'/><text x='270' y='60' font-size='32' fill='white' text-anchor='middle'>Ce soir on mange</text></svg>",
-      "sizes": "540x720",
-      "type": "image/svg+xml",
-      "form_factor": "narrow"
+      "type": "image/svg+xml"
     }
   ]
 }
