@@ -6,12 +6,12 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "theme_color": "#2E6A4C",
-  "background_color": "#F3F5EF",
+  "theme_color": "#B8E0D8",
+  "background_color": "#F3FAF7",
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%232E6A4C' width='192' height='192'/%3E%3Ccircle cx='96' cy='96' r='40' fill='white'/%3E%3C/svg%3E",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%23B8E0D8' width='192' height='192'/%3E%3Ccircle cx='96' cy='96' r='40' fill='%235A7B7A'/%3E%3C/svg%3E",
       "sizes": "192x192",
       "type": "image/svg+xml"
     }

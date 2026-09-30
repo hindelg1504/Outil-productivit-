@@ -14,24 +14,27 @@
   <style>
 /* Layout : une colonne mobile (640px max), onglets fixés en bas, feuilles modales qui montent du bas */
 :root{
-  --bg:#FFFFFF; --surface:#FFFFFF; --sunk:#F0F0F0; --ink:#1C241E; --muted:#5B685E; --line:#E5E5E5;
-  --accent:#2E6A4C; --accent-ink:#FFFFFF; --accent-soft:#E8F0EB; --saffron:#C98A06; --saffron-soft:#F8EBC9;
+  --bg:#F3FAF7; --surface:#FFFFFF; --sunk:#E5F5F0; --ink:#5A7B7A; --muted:#7A9B99; --line:#D4EFE9;
+  --accent:#B8E0D8; --accent-ink:#5A7B7A; --accent-soft:#E8F5F1; --saffron:#C98A06; --saffron-soft:#F8EBC9;
   --veg:#3E8E57; --fish:#2F72A8; --meat:#A4513A; --danger:#B3402E;
-  --shadow:0 1px 2px rgba(28,36,30,.08),0 4px 16px rgba(28,36,30,.08);
+  --shadow:0 1px 2px rgba(90,123,122,.06),0 4px 16px rgba(90,123,122,.06);
   --f-display:"Young Serif",Georgia,"Times New Roman",serif;
   --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --r:14px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#111713; --surface:#19211C; --sunk:#222C25; --ink:#E6ECE6; --muted:#9AA79D; --line:#2C3830;
-  --accent:#72C597; --accent-ink:#0F1A13; --accent-soft:#1F3A2A; --saffron:#EDB53A; --saffron-soft:#3A2F14;
+  --bg:#1A3935; --surface:#2A4A47; --sunk:#344F4B; --ink:#E8F5F3; --muted:#B8D4D0; --line:#3D5B57;
+  --accent:#7EC4B8; --accent-ink:#1A3935; --accent-soft:#2F5A53; --saffron:#EDB53A; --saffron-soft:#3A2F14;
   --veg:#74C68D; --fish:#6FAEE0; --meat:#E08E73; --danger:#EE8672;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25); color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#111713; --surface:#19211C; --sunk:#222C25; --ink:#E6ECE6; --muted:#9AA79D; --line:#2C3830;
-  --accent:#72C597; --accent-ink:#0F1A13; --accent-soft:#1F3A2A; --saffron:#EDB53A; --saffron-soft:#3A2F14;
+  --bg:#1A3935; --surface:#2A4A47; --sunk:#344F4B; --ink:#E8F5F3; --muted:#B8D4D0; --line:#3D5B57;
+  --accent:#7EC4B8; --accent-ink:#1A3935; --accent-soft:#2F5A53; --saffron:#EDB53A; --saffron-soft:#3A2F14;
   --veg:#74C68D; --fish:#6FAEE0; --meat:#E08E73; --danger:#EE8672;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25); color-scheme:dark}
+:root[data-theme="light"]{
+  --bg:#F3FAF7; --surface:#FFFFFF; --sunk:#E5F5F0; --ink:#5A7B7A; --muted:#7A9B99; --line:#D4EFE9;
+  --accent:#B8E0D8; --accent-ink:#5A7B7A; --accent-soft:#E8F5F1; color-scheme:light}
 
 *{box-sizing:border-box}
 html,body{background:var(--bg);color:var(--ink)}
@@ -362,7 +365,8 @@ function metaLine(m,st){
   return `<div class="meta">${bits.join("")}</div>`;
 }
 function header(title){
-  return `<header class="top"><div><div class="date">${esc(dayLong(today()))}</div><h1>${title}</h1></div><button class="btn ghost small" data-act="settings" aria-label="Réglages">Réglages</button></header>`;
+  const theme=localStorage.getItem("theme")||"auto";
+  return `<header class="top"><div><div class="date">${esc(dayLong(today()))}</div><h1>${title}</h1></div><div style="display:flex;gap:8px;align-items:center"><button class="btn ghost small" id="themebtn" data-act="toggle-theme" aria-label="Basculer le thème">${theme==="light"?"☀️":theme==="dark"?"🌙":"🎨"}</button><button class="btn ghost small" data-act="settings" aria-label="Réglages">Réglages</button></div></header>`;
 }
 
 /* --- Onglet Ce soir --- */
@@ -635,6 +639,15 @@ document.addEventListener("click",e=>{
   if(sheetActions[act]&&el.closest("#sheetRoot")){sheetActions[act](v,el);return}
   const A={
     tab:()=>{S.ui.tab=v;render();scrollTo(0,0)},
+    "toggle-theme":()=>{
+      const root=document.documentElement;
+      const current=localStorage.getItem("theme")||"auto";
+      const next=current==="light"?"dark":current==="dark"?"auto":"light";
+      localStorage.setItem("theme",next);
+      if(next==="auto") root.removeAttribute("data-theme");
+      else root.setAttribute("data-theme",next);
+      render();
+    },
     settings:sheetSettings,
     ftime:()=>{S.ui.time=v;S.ui.touched=true;newPicks();render()},
     ftype:()=>{S.ui.type=v;S.ui.touched=true;newPicks();render()},
@@ -691,6 +704,8 @@ document.addEventListener("submit",e=>{
 });
 
 /* ---------- Démarrage ---------- */
+const theme=localStorage.getItem("theme")||"auto";
+if(theme!=="auto") document.documentElement.setAttribute("data-theme",theme);
 render();
 (async()=>{
   const c=window.claude;
