@@ -1,7 +1,17 @@
-<title>Ce soir on mange</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
-<style>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2E6A4C">
+  <meta name="description" content="Application mobile pour choisir quoi manger ce soir">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%232E6A4C' width='192' height='192'/><circle cx='96' cy='96' r='40' fill='white'/></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%232E6A4C' width='180' height='180'/><circle cx='90' cy='90' r='35' fill='white'/></svg>">
+  <title>Ce soir on mange</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
+  <style>
 /* Layout : une colonne mobile (640px max), onglets fixés en bas, feuilles modales qui montent du bas */
 :root{
   --bg:#F3F5EF; --surface:#FFFFFF; --sunk:#E8ECE3; --ink:#1C241E; --muted:#5B685E; --line:#D7DDD2;
@@ -25,7 +35,7 @@
 
 *{box-sizing:border-box}
 html,body{background:var(--bg);color:var(--ink)}
-body{font-family:var(--f-body);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body{font-family:var(--f-body);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased;margin:0;padding:0}
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -127,7 +137,9 @@ nav.tabs button[aria-current="page"]{color:var(--accent);background:var(--accent
 @media (prefers-reduced-motion:reduce){.spinner{animation:none}}
 .hr{height:1px;background:var(--line)}
 .hide{display:none!important}
-</style>
+  </style>
+</head>
+<body>
 
 <div class="app" id="main" aria-live="polite"></div>
 <nav class="tabs" aria-label="Sections"><div class="in" id="tabs"></div></nav>
@@ -452,7 +464,7 @@ function vCatalog(){
   const fchips=[["all","Tout"],["aime","On aime"],["essayer","À essayer"],["new","À trier"],["non","Pas pour nous"]];
   if(counts.noname) fchips.push(["noname","Photos à nommer"]);
   let h=header("Mon catalogue");
-  h+=`<div class="row"><button class="btn primary" data-act="add">Ajouter un plat</button>${assets?`<button class="btn" data-act="bulk">Importer des photos</button>`:""}${counts.new?`<button class="btn" data-act="triage">Trier les idées (${counts.new})</button>`:""}</div>`;
+  h+=`<div class="row"><button class="btn primary" data-act="add">Ajouter un plat</button>${counts.new?`<button class="btn" data-act="triage">Trier les idées (${counts.new})</button>`:""}</div>`;
   h+=`<div class="field"><label for="csearch">Chercher un plat ou un ingrédient</label><input id="csearch" type="search" value="${esc(S.ui.q)}" placeholder="ex. poulet, courgette" autocomplete="off"></div>`;
   h+=`<div class="chips">${fchips.map(([v,l])=>`<button class="chip" data-act="cfilter" data-v="${v}" aria-pressed="${f===v}">${l}<span class="n">${counts[v]||0}</span></button>`).join("")}</div>`;
   h+=list.length?`<div class="list">${list.map(m=>`<button class="item" data-act="open" data-id="${m.id}">
@@ -521,7 +533,6 @@ function sheetDetail(id,isNew){
     openSheet(`
       <div class="between"><h2>${isNew?"Ajouter un plat":"Fiche du plat"}</h2><button class="btn ghost" data-act="closesheet">Fermer</button></div>
       ${draft.photo?`<img class="bigphoto" src="${photoUrl(draft.photo)}" alt="">`:""}
-      ${assets?`<div class="row"><label class="btn" for="photoin">${draft.photo?"Changer la photo":"Ajouter une photo (facultatif)"}</label><input id="photoin" type="file" accept="image/*" class="hide">${draft.photo?`<button class="btn ghost" data-act="rmphoto">Retirer la photo</button>`:""}<span id="photostate" class="small muted"></span></div>`:""}
       <div class="field"><label for="dname">Nom du plat</label><input id="dname" type="text" value="${esc(draft.name)}" placeholder="ex. Gratin de pâtes de mamie" autocomplete="off"></div>
       <div class="row" style="align-items:flex-end">
         <div class="field" style="flex:1;min-width:130px"><label for="dtime">Temps</label><select id="dtime">${tOpts}</select></div>
@@ -533,14 +544,7 @@ function sheetDetail(id,isNew){
       ${!isNew&&st.count[m.id]?`<p class="small muted" style="margin:0">Cuisiné ${st.count[m.id]} fois, la dernière ${ago(daysBetween(st.last[m.id],today()))}.</p>`:""}
       <div class="row"><button class="btn primary" data-act="dsave">Enregistrer</button>${!isNew?`<button class="btn" data-act="deat">On mange ça ce soir</button>`:""}</div>
       ${!isNew&&!draft.lib?`<div class="hr"></div><div class="row" id="delzone"><button class="btn ghost danger" data-act="ddel">Supprimer ce plat</button></div>`:""}
-    `,sh=>{
-      const pin=sh.querySelector("#photoin");
-      pin&&pin.addEventListener("change",async()=>{
-        const f=pin.files[0];if(!f)return;
-        sh.querySelector("#photostate").innerHTML='<span class="spinner"></span> Envoi…';
-        try{grab();draft.photo=await uploadPhoto(f);draw()}catch(e){sh.querySelector("#photostate").textContent=photoErr(e)}
-      });
-    });
+    `);
   };
   const grab=()=>{const sh=$("#sheetRoot .sheet");if(!sh)return;
     draft.name=sh.querySelector("#dname").value.trim();draft.time=+sh.querySelector("#dtime").value;
@@ -548,7 +552,6 @@ function sheetDetail(id,isNew){
   sheetActions={
     dtype:v=>{grab();draft.type=draft.type===v?"":v;draw()},
     dstatus:v=>{grab();draft.status=v;draw()},
-    rmphoto:()=>{grab();draft.photo=null;draw()},
     dsave:()=>{grab();if(!draft.name){toast("Donne un nom au plat.");return}
       const f={name:draft.name,time:draft.time,type:draft.type,ing:draft.ing,note:draft.note,status:draft.status,photo:draft.photo};
       if(isNew) f.createdAt=Date.now();
@@ -556,7 +559,7 @@ function sheetDetail(id,isNew){
     deat:()=>{grab();if(draft.name){saveMeal(draft.id,{name:draft.name,time:draft.time,type:draft.type,ing:draft.ing,note:draft.note,status:draft.status,photo:draft.photo})}
       logMeal(today(),{...draft});closeSheet();S.ui.tab="tonight";render();toast("Noté pour ce soir")},
     ddel:()=>{$("#delzone").innerHTML=`<span class="small">Supprimer définitivement ?</span><button class="btn danger" data-act="ddelyes">Oui, supprimer</button><button class="btn ghost" data-act="closesheet">Annuler</button>`},
-    ddelyes:()=>{write("meals",draft.id,null);if(draft.photo&&assets)assets.delete(draft.photo).catch(()=>{});closeSheet();toast("Plat supprimé")}
+    ddelyes:()=>{write("meals",draft.id,null);closeSheet();toast("Plat supprimé")}
   };
   draw();
 }
@@ -623,71 +626,6 @@ function sheetSettings(){
 }
 let sheetActions={};
 
-/* ---------- Photos ---------- */
-async function toJpeg(file){
-  const url=URL.createObjectURL(file);
-  try{
-    const img=new Image();await new Promise((r,j)=>{img.onload=r;img.onerror=()=>j({code:"decode"});img.src=url});
-    const k=Math.min(1,1200/Math.max(img.naturalWidth,img.naturalHeight));
-    const c=document.createElement("canvas");c.width=Math.round(img.naturalWidth*k);c.height=Math.round(img.naturalHeight*k);
-    c.getContext("2d").drawImage(img,0,0,c.width,c.height);
-    return await new Promise(r=>c.toBlob(r,"image/jpeg",0.82));
-  }finally{URL.revokeObjectURL(url)}
-}
-async function uploadPhoto(file){const blob=await toJpeg(file);const r=await assets.upload(blob,{type:"image/jpeg"});return r.id}
-function photoErr(e){return e?.code==="decode"?"Ce format d'image n'est pas lisible. Essaie une photo JPEG ou PNG.":e?.code==="too_large"?"Photo trop lourde.":e?.code==="quota_exceeded"?"Espace photo plein.":"Envoi impossible. Réessaie."}
-async function bulkImport(files){
-  let ok=0;toast(`Envoi de ${files.length} photo(s)…`);
-  for(const f of files){try{const id=await uploadPhoto(f);saveMeal(newId(),{name:"",time:30,type:"",ing:[],status:"aime",photo:id,createdAt:Date.now()});ok++}catch(e){toast(photoErr(e))}}
-  if(ok){S.ui.tab="catalog";S.ui.cfilter="noname";render();toast(`${ok} photo(s) importée(s). Donne un nom à chaque plat.`)}
-}
-
-/* ---------- Claude ---------- */
-async function askClaude(){
-  const liked=catalog().filter(m=>m.status==="aime"&&m.name).map(m=>m.name).slice(0,30);
-  const avoid=avoidList();
-  const porkNote=avoid.some(w=>norm(w)==="porc")?" (donc aucun lardon, jambon de porc, chorizo, saucisson, lard, saucisse de porc ni gélatine de porc)":"";
-  const time=S.ui.time==="any"?"pas de limite stricte (moins d'une heure)":S.ui.time+" minutes maximum";
-  const type={all:"peu importe",v:"végétarien",p:"poisson ou fruits de mer",m:"viande (hors porc)"}[S.ui.type];
-  const prompt=`Tu aides une famille de ${people()} personnes en France à choisir un dîner de semaine simple.
-Ingrédients disponibles : ${S.ui.fridge.trim()||"non précisé, propose des ingrédients courants"}.
-Temps de préparation et cuisson : ${time}.
-Type de plat souhaité : ${type}.
-À ne jamais utiliser : ${avoid.join(", ")}${porkNote}.
-Plats qu'ils aiment déjà (pour cerner leurs goûts, ne pas les reproposer) : ${liked.join(" ; ")||"non renseigné"}.
-Propose 3 idées différentes, faisables par un cuisinier amateur, avec des ingrédients de supermarché.
-Réponds uniquement avec ce JSON : {"ideas":[{"name":"Nom du plat","time":25,"type":"v","ingredients":["300 g de riz","..."],"steps":["...","..."]}]}
-"type" vaut "v" (végétarien), "p" (poisson) ou "m" (viande). Quantités pour ${people()} personnes. 3 à 5 étapes courtes en français.`;
-  S.ui.ai={loading:true};render();
-  try{
-    const r=await sample.json(prompt);
-    const ideas=(r&&Array.isArray(r.ideas)?r.ideas:[]).filter(x=>x&&x.name).slice(0,3);
-    S.ui.ai=ideas.length?{ideas}:{error:"Claude n'a pas renvoyé d'idée exploitable. Réessaie."};
-  }catch(e){
-    S.ui.ai={error:e?.code==="not_granted"?"Tu n'as pas autorisé la page à interroger Claude.":e?.code==="rate_limited"?"Trop de demandes d'un coup. Attends une minute.":"Claude n'a pas pu répondre. Réessaie."};
-  }
-  render();
-}
-function saveAiIdea(i){
-  const x=S.ui.ai.ideas[i];if(x.savedId)return x.savedId;
-  const id=newId();
-  saveMeal(id,{name:x.name,time:+x.time||30,type:TYPES[x.type]?x.type:"",ing:(x.ingredients||[]).map(s=>String(s)),note:(x.steps||[]).map((s,k)=>`${k+1}. ${s}`).join("\n"),status:"essayer",createdAt:Date.now()});
-  x.saved=true;x.savedId=id;return id;
-}
-
-/* ---------- Courses ---------- */
-function addWeekToShop(){
-  const t=today(),cat=catalog(),list=S.col.shopping.list?.items||[];
-  const have=new Set(list.map(i=>norm(i.text)));
-  const map=new Map();
-  for(let i=0;i<7;i++){const p=S.col.plan[addDays(t,i)];if(!p)continue;const m=cat.find(c=>c.id===p.mealId);if(!m)continue;
-    for(const ing of m.ing){const k=norm(ing);if(have.has(k))continue;if(!map.has(k))map.set(k,{text:ing,for:[]});map.get(k).for.push(m.name)}}
-  if(!map.size){toast(Object.keys(S.col.plan).some(d=>d>=t)?"Tout est déjà sur la liste.":"Planifie d'abord quelques soirs dans l'onglet Semaine.");return false}
-  const items=[...list.map(i=>({...i})),...[...map.values()].map(v=>({id:newId(),text:v.text,done:false,for:v.for.join(", ")}))];
-  write("shopping","list",{items});toast(`${map.size} article(s) ajouté(s)`);return true;
-}
-function setItems(fn){const items=(S.col.shopping.list?.items||[]).map(i=>({...i}));write("shopping","list",{items:fn(items)})}
-
 /* ---------- Évènements ---------- */
 document.addEventListener("click",e=>{
   const el=e.target.closest("[data-act]");if(!el)return;
@@ -715,11 +653,7 @@ document.addEventListener("click",e=>{
     skip:()=>{skip(v);render()},
     verdict:()=>{setStatus(id,v);toast(v==="aime"?"Ajouté aux plats qu'on aime":"Il ne sera plus proposé")},
     triage:sheetTriage,
-    ai:askClaude,
-    aisave:()=>{saveAiIdea(+el.dataset.i);render();toast("Ajouté au catalogue, rubrique « À essayer »")},
-    aieat:()=>{const i=+el.dataset.i,x=S.ui.ai.ideas[i],mid=saveAiIdea(i);logMeal(today(),{id:mid,name:x.name,status:"essayer"});render();scrollTo({top:0,behavior:"smooth"});toast("Bon appétit ! La recette est dans le catalogue.")},
     cfilter:()=>{S.ui.cfilter=v;render()},
-    bulk:()=>{const i=document.createElement("input");i.type="file";i.accept="image/*";i.multiple=true;i.onchange=()=>i.files.length&&bulkImport([...i.files]);i.click()},
     pick:()=>sheetPick(el.dataset.d),
     unplan:()=>write("plan",el.dataset.d,null),
     autofill:()=>{
@@ -774,3 +708,6 @@ render();
   }
 })();
 </script>
+
+</body>
+</html>
