@@ -383,7 +383,7 @@ function header(title){
 /* --- Onglet Ce soir --- */
 function vTonight(){
   const t=today(),st=stats(),logT=S.col.log[t],planT=S.col.plan[t];
-  let h=header("Qu'est-ce qu'on mange ce soir ?");
+  let h=header("Qu'est-ce qu'on mange ce soir ? 🍽️");
   if(S.noDb) h+=`<div class="banner"><strong>Sauvegarde indisponible</strong><span class="small">Ouvre cette page depuis ton compte Claude pour que tes choix soient conservés. Pour l'instant, rien n'est enregistré.</span></div>`;
   if(logT){
     h+=`<section class="tonight"><span class="lbl">Ce soir</span><div class="name">${esc(logT.name)}</div><div class="row"><button class="btn ghost" data-act="unlog">Changer</button></div></section>`;
@@ -400,7 +400,7 @@ function vTonight(){
   const cat=catalog(),words=fridgeWords(S.ui.fridge);
   const picks=S.ui.picks.map(id=>cat.find(m=>m.id===id)).filter(Boolean);
   h+=`<section class="panel" id="ideas">
-    <div class="between"><h2>Trois idées pour ce soir</h2></div>
+    <div class="between"><h2>Trois idées pour ce soir ✨</h2></div>
     <div class="stack">
       <div class="field"><span class="lbl">Temps disponible</span><div class="chips">${tchips.map(([v,l])=>`<button class="chip" data-act="ftime" data-v="${v}" aria-pressed="${S.ui.time===v}">${l}</button>`).join("")}</div></div>
       <div class="field"><span class="lbl">Envie de</span><div class="chips">${ychips.map(([v,l])=>`<button class="chip" data-act="ftype" data-v="${v}" aria-pressed="${S.ui.type===v}">${v!=="all"?`<i class="dot ${v}"></i> `:""}${l}</button>`).join("")}</div></div>
@@ -456,7 +456,7 @@ function vUnsorted(){
 function vClaude(){
   if(!sample) return "";
   const ai=S.ui.ai;
-  let h=`<section class="panel"><div class="stack"><h2>Besoin d'une idée neuve ?</h2><span class="muted small">Claude propose trois plats avec ce que tu as indiqué plus haut, pour ${people()} personnes, sans ${esc(avoidList().join(" ni "))}.</span></div>
+  let h=`<section class="panel"><div class="stack"><h2>Besoin d'une idée neuve ? 💡</h2><span class="muted small">Claude propose trois plats avec ce que tu as indiqué plus haut, pour ${people()} personnes, sans ${esc(avoidList().join(" ni "))}.</span></div>
     <button class="btn big primary" data-act="ai" ${ai?.loading?"disabled":""}>${ai?.loading?'<span class="spinner"></span> Claude réfléchit…':"Demander des idées à Claude"}</button>`;
   if(ai?.error) h+=`<div class="warn">${esc(ai.error)}</div>`;
   if(ai?.ideas) h+=`<div class="stack">${ai.ideas.map((x,i)=>`<article class="idea"><div class="body"><div class="name">${esc(x.name)}</div>
@@ -478,7 +478,7 @@ function vCatalog(){
   list.sort((a,b)=>(order[a.status]-order[b.status])||((st.count[b.id]||0)-(st.count[a.id]||0))||a.name.localeCompare(b.name,"fr"));
   const fchips=[["all","Tout"],["aime","On aime"],["essayer","À essayer"],["new","À trier"],["non","Pas pour nous"]];
   if(counts.noname) fchips.push(["noname","Photos à nommer"]);
-  let h=header("Mon catalogue");
+  let h=header("Mon catalogue 📖");
   h+=`<div class="row"><button class="btn primary" data-act="add">Ajouter un plat</button>${counts.new?`<button class="btn" data-act="triage">Trier les idées (${counts.new})</button>`:""}</div>`;
   h+=`<div class="field"><label for="csearch">Chercher un plat ou un ingrédient</label><input id="csearch" type="search" value="${esc(S.ui.q)}" placeholder="ex. poulet, courgette" autocomplete="off"></div>`;
   h+=`<div class="chips">${fchips.map(([v,l])=>`<button class="chip" data-act="cfilter" data-v="${v}" aria-pressed="${f===v}">${l}<span class="n">${counts[v]||0}</span></button>`).join("")}</div>`;
@@ -493,7 +493,7 @@ function vCatalog(){
 /* --- Onglet Semaine --- */
 function vWeek(){
   const t=today(),cat=catalog();
-  let h=header("La semaine");
+  let h=header("La semaine 🗓️");
   h+=`<div class="row"><button class="btn primary" data-act="autofill">Remplir les soirs vides</button><button class="btn" data-act="toshop">Faire la liste de courses</button></div>`;
   h+=`<p class="muted small" style="margin:0">Du lundi au jeudi, le remplissage automatique choisit des plats de 35 minutes maximum.</p>`;
   h+=`<div class="list">`;
@@ -507,7 +507,7 @@ function vWeek(){
   }
   h+=`</div>`;
   const hist=Object.values(S.col.log).filter(l=>l.date<t&&daysBetween(l.date,t)<=21).sort((a,b)=>b.date.localeCompare(a.date));
-  h+=`<section class="panel"><h2>Ces trois dernières semaines</h2>`;
+  h+=`<section class="panel"><h2>Ces trois dernières semaines 📝</h2>`;
   h+=hist.length?`<div class="list">${hist.map(l=>`<div class="item day"><span class="d">${esc(dayShort(l.date))}</span><span class="txt"><span class="t">${esc(l.name)}</span></span></div>`).join("")}</div>`
     :`<div class="card muted small">L'historique se remplit quand tu notes ce que vous avez mangé (bouton « On mange ça » ou question « hier soir ? »).</div>`;
   return h+`</section>`;
@@ -516,7 +516,7 @@ function vWeek(){
 /* --- Onglet Courses --- */
 function vShop(){
   const items=S.col.shopping.list?.items||[];
-  let h=header("Liste de courses");
+  let h=header("Liste de courses 🛒");
   h+=`<div class="row"><button class="btn primary" data-act="toshop">Ajouter les ingrédients de la semaine</button></div>`;
   h+=`<form class="row" id="shopform" style="flex-wrap:nowrap"><input id="shopin" type="text" placeholder="Ajouter un article" autocomplete="off" style="flex:1;min-width:0"><button class="btn" type="submit">Ajouter</button></form>`;
   if(!items.length) return h+`<div class="card muted small">La liste est vide. Planifie quelques soirs dans l'onglet Semaine, puis ajoute leurs ingrédients ici en un clic.</div>`;
@@ -570,14 +570,14 @@ function sheetDetail(id,isNew){
     dsave:()=>{grab();if(!draft.name){toast("Donne un nom au plat.");return}
       const f={name:draft.name,time:draft.time,type:draft.type,ing:draft.ing,note:draft.note,status:draft.status,photo:draft.photo};
       if(isNew) f.createdAt=Date.now();
-      saveMeal(draft.id,f);closeSheet();toast(isNew?"Plat ajouté au catalogue":"Enregistré")},
+      saveMeal(draft.id,f);closeSheet();toast(isNew?"Plat ajouté au catalogue 🌸":"Enregistré ✅")},
     deat:()=>{grab();if(draft.name){saveMeal(draft.id,{name:draft.name,time:draft.time,type:draft.type,ing:draft.ing,note:draft.note,status:draft.status,photo:draft.photo})}
-      logMeal(today(),{...draft});closeSheet();S.ui.tab="tonight";render();toast("Noté pour ce soir")},
+      logMeal(today(),{...draft});closeSheet();S.ui.tab="tonight";render();toast("Noté pour ce soir 😋")},
     ddel:()=>{$("#delzone").innerHTML=`<span class="small">Supprimer définitivement ?</span><button class="btn danger" data-act="ddelyes">Oui, supprimer</button><button class="btn ghost" data-act="closesheet">Annuler</button>`},
     ddelyes:()=>{
       if(draft.lib) write("meals",draft.id,{deleted:true});
       else write("meals",draft.id,null);
-      closeSheet();toast("Plat supprimé")
+      closeSheet();toast("Plat supprimé 👋")
     }
   };
   draw();
@@ -587,7 +587,7 @@ function sheetTriage(){
   const skipList=new Set();
   const draw=()=>{
     const list=catalog().filter(m=>m.status==="new"&&!skipList.has(m.id));
-    if(!list.length){openSheet(`<div class="triage"><div class="name">C'est trié !</div><p class="muted">Les suggestions tiennent maintenant compte de tes goûts.</p><button class="btn primary big" data-act="closesheet">Terminer</button></div>`);return}
+    if(!list.length){openSheet(`<div class="triage"><div class="name">C'est trié ! 🎉</div><p class="muted">Les suggestions tiennent maintenant compte de tes goûts.</p><button class="btn primary big" data-act="closesheet">Terminer</button></div>`);return}
     const m=list[0];
     openSheet(`<div class="between"><span class="lbl">${list.length} restante${list.length>1?"s":""}</span><button class="btn ghost" data-act="closesheet">Fermer</button></div>
       <div class="triage"><div class="meta" style="justify-content:center"><span><i class="dot ${m.type}"></i>${TYPES[m.type]}</span><span>${m.time} min</span></div>
@@ -611,17 +611,17 @@ function sheetPick(date){
     <div class="list" id="plist">${cat.map(row).join("")}</div>`,sh=>{
       sh.querySelector("#psearch").addEventListener("input",e=>{const q=norm(e.target.value);sh.querySelectorAll("#plist .item").forEach(b=>b.hidden=!!q&&!b.dataset.s.includes(q))});
     });
-  sheetActions={setplan:(v,el)=>{const m=byId(el.dataset.id);write("plan",date,{mealId:m.id,name:m.name});closeSheet();toast("Ajouté au planning")}};
+  sheetActions={setplan:(v,el)=>{const m=byId(el.dataset.id);write("plan",date,{mealId:m.id,name:m.name});closeSheet();toast("Ajouté au planning 🗓️")}};
 }
 function sheetPlanFor(id){
   const m=byId(id),t=today();
   openSheet(`<div class="between"><h2>Planifier « ${esc(m.name)} »</h2><button class="btn ghost" data-act="closesheet">Fermer</button></div>
     <div class="list">${[...Array(7)].map((_,i)=>{const d=addDays(t,i),p=S.col.plan[d];return `<button class="item day ${i===0?"today":""}" data-act="planday" data-d="${d}"><span class="d">${i===0?"Ce soir":esc(dayShort(d))}</span><span class="txt"><span class="${p?"t":"muted"}">${p?esc(p.name)+" (remplacer)":"Libre"}</span></span></button>`}).join("")}</div>`);
-  sheetActions={planday:(v,el)=>{write("plan",el.dataset.d,{mealId:m.id,name:m.name});closeSheet();toast("Ajouté au planning")}};
+  sheetActions={planday:(v,el)=>{write("plan",el.dataset.d,{mealId:m.id,name:m.name});closeSheet();toast("Ajouté au planning 🗓️")}};
 }
 function sheetLogOther(date){
   const cat=catalog().filter(m=>m.name&&m.status!=="non").sort((a,b)=>a.name.localeCompare(b.name,"fr"));
-  openSheet(`<div class="between"><h2>Hier soir, c'était…</h2><button class="btn ghost" data-act="closesheet">Fermer</button></div>
+  openSheet(`<div class="between"><h2>Hier soir, c'était… 🤔</h2><button class="btn ghost" data-act="closesheet">Fermer</button></div>
     <div class="field"><label for="lsearch">Nom du plat</label><input id="lsearch" type="search" placeholder="Tape pour chercher ou créer" autocomplete="off"></div>
     <button class="btn primary hide" id="lcreate" data-act="lcreate">Créer</button>
     <div class="list" id="llist">${cat.map(m=>`<button class="item" data-act="lpick" data-id="${m.id}" data-s="${esc(norm(m.name))}"><span class="txt"><span class="t">${esc(m.name)}</span></span></button>`).join("")}</div>`,sh=>{
@@ -632,16 +632,16 @@ function sheetLogOther(date){
   });
   sheetActions={
     lpick:(v,el)=>{logMeal(date,byId(el.dataset.id));closeSheet();toast("Noté")},
-    lcreate:()=>{const name=$("#lsearch").value.trim();if(!name)return;const id=newId();saveMeal(id,{name,time:30,type:"",ing:[],status:"aime",createdAt:Date.now()});logMeal(date,{id,name,status:"aime"});closeSheet();toast("Plat ajouté et noté")}
+    lcreate:()=>{const name=$("#lsearch").value.trim();if(!name)return;const id=newId();saveMeal(id,{name,time:30,type:"",ing:[],status:"aime",createdAt:Date.now()});logMeal(date,{id,name,status:"aime"});closeSheet();toast("Plat ajouté et noté 🌸")}
   };
 }
 function sheetSettings(){
-  openSheet(`<div class="between"><h2>Réglages</h2><button class="btn ghost" data-act="closesheet">Fermer</button></div>
+  openSheet(`<div class="between"><h2>Réglages ⚙️</h2><button class="btn ghost" data-act="closesheet">Fermer</button></div>
     <div class="field"><label for="savoid">Aliments à ne jamais proposer (séparés par des virgules)</label><input id="savoid" type="text" value="${esc(avoidList().join(", "))}"></div>
     <div class="field"><label for="speople">Nombre de personnes</label><select id="speople">${[1,2,3,4,5,6].map(n=>`<option ${n===people()?"selected":""}>${n}</option>`).join("")}</select></div>
     <p class="small muted" style="margin:0">Les idées de départ qui contiennent un de ces mots sont masquées. Claude en tient compte aussi.</p>
     <button class="btn primary" data-act="ssave">Enregistrer</button>`);
-  sheetActions={ssave:()=>{const avoid=$("#savoid").value.split(",").map(s=>s.trim()).filter(Boolean);write("settings","main",{avoid,people:+$("#speople").value});S.ui.picks=null;closeSheet();toast("Réglages enregistrés")}};
+  sheetActions={ssave:()=>{const avoid=$("#savoid").value.split(",").map(s=>s.trim()).filter(Boolean);write("settings","main",{avoid,people:+$("#speople").value});S.ui.picks=null;closeSheet();toast("Réglages enregistrés ✅")}};
 }
 let sheetActions={};
 
@@ -668,12 +668,12 @@ document.addEventListener("click",e=>{
     ftype:()=>{S.ui.type=v;S.ui.touched=true;newPicks();render()},
     reroll:()=>{S.ui.touched=true;const old=new Set(S.ui.picks||[]);S.ui.picks=suggest(3,{time:S.ui.time,type:S.ui.type,fridge:S.ui.fridge,exclude:old});if(S.ui.picks.length<3)newPicks();render()},
     swap:()=>{S.ui.touched=true;const ex=new Set(S.ui.picks);const n=suggest(1,{time:S.ui.time,type:S.ui.type,fridge:S.ui.fridge,exclude:ex})[0];S.ui.picks=n?S.ui.picks.map(x=>x===id?n:x):S.ui.picks.filter(x=>x!==id);render()},
-    eat:()=>{logMeal(today(),byId(id));render();scrollTo({top:0,behavior:"smooth"});toast("Bon appétit ! C'est noté.")},
+    eat:()=>{logMeal(today(),byId(id));render();scrollTo({top:0,behavior:"smooth"});toast("Bon appétit ! C'est noté. 😋")},
     plan:()=>sheetPlanFor(id),
     open:()=>sheetDetail(id),
     add:()=>sheetDetail(null,true),
     unlog:()=>{write("log",today(),null)},
-    eatplan:()=>{const p=S.col.plan[today()];const m=byId(p.mealId);logMeal(today(),m||{id:p.mealId,name:p.name,status:"aime"});toast("Bon appétit !")},
+    eatplan:()=>{const p=S.col.plan[today()];const m=byId(p.mealId);logMeal(today(),m||{id:p.mealId,name:p.name,status:"aime"});toast("Bon appétit ! 😋")},
     scrollideas:()=>$("#ideas")?.scrollIntoView({behavior:"smooth"}),
     logy:()=>{logMeal(addDays(today(),-1),byId(id));toast("Noté pour hier")},
     logyother:()=>sheetLogOther(addDays(today(),-1)),
@@ -694,7 +694,7 @@ document.addEventListener("click",e=>{
     clearshop:()=>{el.outerHTML=`<span class="row"><span class="small">Vider toute la liste ?</span><button class="btn danger" data-act="clearshopyes">Oui</button><button class="btn ghost" data-act="tab" data-v="shop">Non</button></span>`},
     clearshopyes:()=>write("shopping","list",{items:[]}),
     copyshop:async()=>{const txt=(S.col.shopping.list?.items||[]).filter(i=>!i.done).map(i=>"- "+i.text).join("\n");
-      try{await navigator.clipboard.writeText(txt);toast("Liste copiée")}catch(err){const b=$("#copybox");b.value=txt;b.classList.remove("hide");b.select();toast("Sélectionne et copie le texte ci-dessous")}}
+      try{await navigator.clipboard.writeText(txt);toast("Liste copiée 📋")}catch(err){const b=$("#copybox");b.value=txt;b.classList.remove("hide");b.select();toast("Sélectionne et copie le texte ci-dessous")}}
   };
   A[act]&&A[act]();
 });
