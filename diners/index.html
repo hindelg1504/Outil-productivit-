@@ -218,15 +218,16 @@ const LIB=[
 ["Gratin dauphinois et salade",60,"v","pommes de terre|crème fraîche|lait|ail|salade verte","h"],
 ["Lasagnes à la bolognaise",60,"m","feuilles de lasagne|bœuf haché|tomates concassées|lait|fromage râpé","h"],
 ["Lasagnes épinards et ricotta",60,"v","feuilles de lasagne|épinards|ricotta|tomates concassées|mozzarella",""],
-["Poke bowl au saumon",30,"p","riz|saumon frais|avocat|concombre|graines de sésame|sauce soja",""],
-["Brochettes de poulet et légumes",35,"m","poulet|poivrons|oignons|sauce teriyaki|riz","e"],
-["Pâtes à la carbonara simplifiée",20,"m","pâtes|lardons|œufs|parmesan|poivre noir",""],
-["Tiramisu dans un verre",45,"v","biscuits à la cuillère|mascarpone|œufs|sucre|café|cacao","h"],
-["Polenta crémeuse aux champignons",35,"v","polenta|champignons|parmesan|bouillon|crème fraîche","h"],
-["Bouillabaisse express",40,"p","poisson blanc|fruits de mer|tomates|saffran|aïoli",""],
-["Blanquette de veau",50,"m","veau|petits oignons|champignons|vin blanc|bouillon|crème","h"],
-["Salade de lentilles corail et feta",25,"v","lentilles corail|feta|tomates cerises|oignons rouges|vinaigrette",""],
-["Pad Thaï poulet",30,"m","nouilles de riz|poulet|œufs|cacahuètes|germes de soja|sauce Pad Thaï",""]
+["Poulet basquaise et riz",50,"m","poulet|poivrons|tomates concassées|oignon|riz","","lib-b0"],
+["Poulet à la moutarde et pommes de terre sautées",35,"m","poulet|moutarde|crème fraîche|pommes de terre","","lib-b1"],
+["Keftas de bœuf, semoule et sauce yaourt",35,"m","bœuf haché|cumin|semoule|yaourt nature|concombre","","lib-b2"],
+["Croziflette à la dinde fumée",40,"m","crozets|reblochon|dinde fumée|oignon|crème fraîche","h","lib-b3"],
+["Saumon teriyaki, riz et brocoli",25,"p","saumon|sauce soja|miel|riz|brocoli","","lib-b4"],
+["Truite au four et haricots verts",25,"p","filets de truite|haricots verts|citron|beurre","","lib-b5"],
+["Gratin de chou-fleur",40,"v","chou-fleur|lait|farine|beurre|fromage râpé","h","lib-b6"],
+["Curry de patate douce et épinards",35,"v","patates douces|épinards|lait de coco|curry|riz","h","lib-b7"],
+["Gnocchis à la tomate et mozzarella",25,"v","gnocchis|tomates concassées|mozzarella|basilic","","lib-b8"],
+["Pâtes aux courgettes, ricotta et citron",20,"v","pâtes|courgettes|ricotta|citron|parmesan","e","lib-b9"]
 ];
 const TYPES={v:"Végé",p:"Poisson",m:"Viande"};
 const STATUS={aime:"On aime",essayer:"À essayer",new:"À trier",non:"Pas pour nous"};
@@ -265,7 +266,7 @@ function avoidOk(m){const hay=norm(m.name+" "+m.ing.join(" "));return !avoidList
 function catalog(){
   const out=[],docs=S.col.meals;
   LIB.forEach((l,i)=>{
-    const id="lib-"+i,d=docs[id]||{};
+    const id=l[5]||"lib-"+i,d=docs[id]||{};
     if(d.deleted) return;
     const m={id,lib:true,name:l[0],time:l[1],type:l[2],ing:l[3].split("|"),season:l[4],status:"new",photo:null,note:""};
     for(const k of["name","time","type","ing","status","photo","note"]) if(d[k]!==undefined&&d[k]!==null&&d[k]!=="") m[k]=d[k];
