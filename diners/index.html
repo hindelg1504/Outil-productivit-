@@ -217,7 +217,16 @@ const LIB=[
 ["Tajine de poulet citron et olives",60,"m","poulet|citrons confits|olives|oignons|semoule","h"],
 ["Gratin dauphinois et salade",60,"v","pommes de terre|crème fraîche|lait|ail|salade verte","h"],
 ["Lasagnes à la bolognaise",60,"m","feuilles de lasagne|bœuf haché|tomates concassées|lait|fromage râpé","h"],
-["Lasagnes épinards et ricotta",60,"v","feuilles de lasagne|épinards|ricotta|tomates concassées|mozzarella",""]
+["Lasagnes épinards et ricotta",60,"v","feuilles de lasagne|épinards|ricotta|tomates concassées|mozzarella",""],
+["Poke bowl au saumon",30,"p","riz|saumon frais|avocat|concombre|graines de sésame|sauce soja",""],
+["Brochettes de poulet et légumes",35,"m","poulet|poivrons|oignons|sauce teriyaki|riz","e"],
+["Pâtes à la carbonara simplifiée",20,"m","pâtes|lardons|œufs|parmesan|poivre noir",""],
+["Tiramisu dans un verre",45,"v","biscuits à la cuillère|mascarpone|œufs|sucre|café|cacao","h"],
+["Polenta crémeuse aux champignons",35,"v","polenta|champignons|parmesan|bouillon|crème fraîche","h"],
+["Bouillabaisse express",40,"p","poisson blanc|fruits de mer|tomates|saffran|aïoli",""],
+["Blanquette de veau",50,"m","veau|petits oignons|champignons|vin blanc|bouillon|crème","h"],
+["Salade de lentilles corail et feta",25,"v","lentilles corail|feta|tomates cerises|oignons rouges|vinaigrette",""],
+["Pad Thaï poulet",30,"m","nouilles de riz|poulet|œufs|cacahuètes|germes de soja|sauce Pad Thaï",""]
 ];
 const TYPES={v:"Végé",p:"Poisson",m:"Viande"};
 const STATUS={aime:"On aime",essayer:"À essayer",new:"À trier",non:"Pas pour nous"};
@@ -257,6 +266,7 @@ function catalog(){
   const out=[],docs=S.col.meals;
   LIB.forEach((l,i)=>{
     const id="lib-"+i,d=docs[id]||{};
+    if(d.deleted) return;
     const m={id,lib:true,name:l[0],time:l[1],type:l[2],ing:l[3].split("|"),season:l[4],status:"new",photo:null,note:""};
     for(const k of["name","time","type","ing","status","photo","note"]) if(d[k]!==undefined&&d[k]!==null&&d[k]!=="") m[k]=d[k];
     if(d.photo===null) m.photo=null;
@@ -547,7 +557,7 @@ function sheetDetail(id,isNew){
       <div class="field"><label for="dnote">Notes ou recette</label><textarea id="dnote" rows="3" placeholder="ex. doubler la sauce, les enfants adorent">${esc(draft.note)}</textarea></div>
       ${!isNew&&st.count[m.id]?`<p class="small muted" style="margin:0">Cuisiné ${st.count[m.id]} fois, la dernière ${ago(daysBetween(st.last[m.id],today()))}.</p>`:""}
       <div class="row"><button class="btn primary" data-act="dsave">Enregistrer</button>${!isNew?`<button class="btn" data-act="deat">On mange ça ce soir</button>`:""}</div>
-      ${!isNew&&!draft.lib?`<div class="hr"></div><div class="row" id="delzone"><button class="btn ghost danger" data-act="ddel">Supprimer ce plat</button></div>`:""}
+      ${!isNew?`<div class="hr"></div><div class="row" id="delzone"><button class="btn ghost danger" data-act="ddel">Supprimer ce plat</button></div>`:""}
     `);
   };
   const grab=()=>{const sh=$("#sheetRoot .sheet");if(!sh)return;
@@ -563,7 +573,11 @@ function sheetDetail(id,isNew){
     deat:()=>{grab();if(draft.name){saveMeal(draft.id,{name:draft.name,time:draft.time,type:draft.type,ing:draft.ing,note:draft.note,status:draft.status,photo:draft.photo})}
       logMeal(today(),{...draft});closeSheet();S.ui.tab="tonight";render();toast("Noté pour ce soir")},
     ddel:()=>{$("#delzone").innerHTML=`<span class="small">Supprimer définitivement ?</span><button class="btn danger" data-act="ddelyes">Oui, supprimer</button><button class="btn ghost" data-act="closesheet">Annuler</button>`},
-    ddelyes:()=>{write("meals",draft.id,null);closeSheet();toast("Plat supprimé")}
+    ddelyes:()=>{
+      if(draft.lib) write("meals",draft.id,{deleted:true});
+      else write("meals",draft.id,null);
+      closeSheet();toast("Plat supprimé")
+    }
   };
   draw();
 }
