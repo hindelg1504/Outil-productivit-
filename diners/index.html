@@ -533,7 +533,8 @@ function vTonight(){
     h+=`<section class="tonight"><span class="lbl">Ce soir</span><div class="name">${esc(logT.name)}</div><div class="row"><button class="btn ghost" data-act="unlog">Changer</button></div></section>`;
   }else if(planT){
     const m=byId(planT.mealId);
-    h+=`<section class="tonight"><span class="lbl">Prévu ce soir</span><div class="name">${esc(m?.name||planT.name)}</div><div class="row"><button class="btn" data-act="eatplan">C'est ce qu'on mange</button><button class="btn ghost" data-act="scrollideas">Autre idée</button></div></section>`;
+    const alt=planT.altId&&(byId(planT.altId)||{name:planT.altName});
+    h+=`<section class="tonight"><span class="lbl">Prévu ce soir</span><div class="name">${esc(m?.name||planT.name)}</div>${alt?`<span class="small">Plan B : ${esc(alt.name)}</span>`:""}<div class="row"><button class="btn" data-act="eatplan">C'est ce qu'on mange</button>${alt?`<button class="btn" data-act="eatalt">On fait le plan B</button>`:""}<button class="btn ghost" data-act="scrollideas">Autre idée</button></div></section>`;
   }
   h+=vYesterday();
   h+=vUnsorted();
@@ -644,10 +645,14 @@ function vWeek(){
   for(let i=0;i<7;i++){
     const d=addDays(t,i),p=S.col.plan[d],m=p&&cat.find(c=>c.id===p.mealId);
     const lg=S.col.log[d];
+    const done=lg&&i===0,alt=p&&p.altId&&cat.find(c=>c.id===p.altId);
     h+=`<div class="item day ${i===0?"today":""}"><span class="d">${i===0?"Ce soir":esc(dayShort(d))}</span>
-      <button class="txt linkless" style="background:none;border:0;padding:0;text-align:left" data-act="pick" data-d="${d}">
-        ${lg&&i===0?`<span class="t">${esc(lg.name)}</span><span class="meta"><span>Déjà noté</span></span>`:p?`<span class="t">${esc(m?.name||p.name)}</span>${m?`<span class="meta"><span><i class="dot ${m.type}"></i>${m.time} min</span></span>`:""}`:`<span class="muted">+ Choisir un plat</span>`}
-      </button>${p?`<button class="btn ghost x" data-act="unplan" data-d="${d}" aria-label="Retirer">Retirer</button>`:""}</div>`;
+      <span class="txt"><button class="linkless" style="background:none;border:0;padding:0;text-align:left;display:flex;flex-direction:column;gap:3px" data-act="pick" data-d="${d}">
+        ${done?`<span class="t">${esc(lg.name)}</span><span class="meta"><span>Déjà noté</span></span>`:p?`<span class="t">${esc(m?.name||p.name)}</span>${m?`<span class="meta"><span><i class="dot ${m.type}"></i>${m.time} min</span></span>`:""}`:`<span class="muted">+ Choisir un plat</span>`}
+      </button>
+      ${p&&!done?(p.altId?`<span class="meta" style="flex-wrap:nowrap;align-items:flex-start"><button class="linkbtn small" style="text-align:left;color:var(--ink);text-decoration:none" data-act="pickalt" data-d="${d}">↪ Plan B : ${esc(alt?.name||p.altName)}</button><button class="linkbtn small" style="color:var(--muted);text-decoration:none;padding:0 4px" data-act="unalt" data-d="${d}" aria-label="Retirer le plan B">✕</button></span>`
+        :`<span><button class="linkbtn small" data-act="pickalt" data-d="${d}">+ Plan B</button></span>`):""}
+      </span>${p?`<button class="btn ghost x" data-act="unplan" data-d="${d}" aria-label="Retirer">Retirer</button>`:""}</div>`;
   }
   h+=`</div>`;
   const hist=Object.values(S.col.log).filter(l=>l.date<t&&daysBetween(l.date,t)<=21).sort((a,b)=>b.date.localeCompare(a.date));
@@ -743,25 +748,30 @@ function sheetTriage(){
   draw();
 }
 
-function sheetPick(date){
+function sheetPick(date,isAlt){
+  const cur=S.col.plan[date]||{};
   const planned=new Set(Object.entries(S.col.plan).filter(([d])=>d!==date&&d>=today()).map(([,p])=>p.mealId));
+  if(isAlt&&cur.mealId) planned.add(cur.mealId);
   const wk=parse(date).getDay(),weekday=wk>=1&&wk<=4;
   const sugg=suggest(3,{time:weekday?"35":"any",exclude:planned,forDate:date});
   const cat=catalog().filter(m=>m.status!=="non"&&m.name).sort((a,b)=>({aime:0,essayer:1,new:2}[a.status]-{aime:0,essayer:1,new:2}[b.status])||a.name.localeCompare(b.name,"fr"));
   const row=m=>`<button class="item" data-act="setplan" data-id="${m.id}" data-s="${esc(norm(m.name))}"><span class="th"><i class="dot ${m.type}"></i></span><span class="txt"><span class="t">${esc(m.name)}</span><span class="meta"><span>${m.time} min</span></span></span><span class="pill ${m.status}">${STATUS[m.status]}</span></button>`;
-  openSheet(`<div class="between"><h2>${esc(dayLong(date))}</h2><button class="btn ghost" data-act="closesheet">Fermer</button></div>
-    <span class="lbl">Suggestions</span><div class="list">${sugg.map(id=>row(cat.find(m=>m.id===id)||byId(id))).join("")}</div>
+  openSheet(`<div class="between"><h2>${isAlt?"Plan B · ":""}${esc(dayLong(date))}</h2><button class="btn ghost" data-act="closesheet">Fermer</button></div>
+    ${isAlt?`<p class="small muted" style="margin:0">Une recette de secours si tu n'as pas tout pour « ${esc(cur.name||"")} ».</p>`:""}<span class="lbl">Suggestions</span><div class="list">${sugg.map(id=>row(cat.find(m=>m.id===id)||byId(id))).join("")}</div>
     <div class="field"><label for="psearch">Ou chercher dans le catalogue</label><input id="psearch" type="search" placeholder="ex. gratin" autocomplete="off"></div>
     <div class="list" id="plist">${cat.map(row).join("")}</div>`,sh=>{
       sh.querySelector("#psearch").addEventListener("input",e=>{const q=norm(e.target.value);sh.querySelectorAll("#plist .item").forEach(b=>b.hidden=!!q&&!b.dataset.s.includes(q))});
     });
-  sheetActions={setplan:(v,el)=>{const m=byId(el.dataset.id);write("plan",date,{mealId:m.id,name:m.name});closeSheet();toast("Ajouté au planning 🗓️")}};
+  sheetActions={setplan:(v,el)=>{const m=byId(el.dataset.id);
+    if(isAlt){write("plan",date,{...cur,altId:m.id,altName:m.name});closeSheet();toast("Plan B ajouté 🗓️");return}
+    const keep=cur.altId&&cur.altId!==m.id?{altId:cur.altId,altName:cur.altName}:{};
+    write("plan",date,{mealId:m.id,name:m.name,...keep});closeSheet();toast("Ajouté au planning 🗓️")}};
 }
 function sheetPlanFor(id){
   const m=byId(id),t=today();
   openSheet(`<div class="between"><h2>Planifier « ${esc(m.name)} »</h2><button class="btn ghost" data-act="closesheet">Fermer</button></div>
     <div class="list">${[...Array(7)].map((_,i)=>{const d=addDays(t,i),p=S.col.plan[d];return `<button class="item day ${i===0?"today":""}" data-act="planday" data-d="${d}"><span class="d">${i===0?"Ce soir":esc(dayShort(d))}</span><span class="txt"><span class="${p?"t":"muted"}">${p?esc(p.name)+" (remplacer)":"Libre"}</span></span></button>`}).join("")}</div>`);
-  sheetActions={planday:(v,el)=>{write("plan",el.dataset.d,{mealId:m.id,name:m.name});closeSheet();toast("Ajouté au planning 🗓️")}};
+  sheetActions={planday:(v,el)=>{const c=S.col.plan[el.dataset.d]||{};const keep=c.altId&&c.altId!==m.id?{altId:c.altId,altName:c.altName}:{};write("plan",el.dataset.d,{mealId:m.id,name:m.name,...keep});closeSheet();toast("Ajouté au planning 🗓️")}};
 }
 function sheetLogOther(date){
   const cat=catalog().filter(m=>m.name&&m.status!=="non").sort((a,b)=>a.name.localeCompare(b.name,"fr"));
@@ -817,6 +827,7 @@ document.addEventListener("click",e=>{
     open:()=>sheetDetail(id),
     add:()=>sheetDetail(null,true),
     unlog:()=>{write("log",today(),null)},
+    eatalt:()=>{const p=S.col.plan[today()];const m=byId(p.altId);logMeal(today(),m||{id:p.altId,name:p.altName,status:"aime"});toast("Plan B, bon appétit ! 😋")},
     eatplan:()=>{const p=S.col.plan[today()];const m=byId(p.mealId);logMeal(today(),m||{id:p.mealId,name:p.name,status:"aime"});toast("Bon appétit ! 😋")},
     scrollideas:()=>$("#ideas")?.scrollIntoView({behavior:"smooth"}),
     logy:()=>{logMeal(addDays(today(),-1),byId(id));toast("Noté pour hier")},
@@ -827,6 +838,8 @@ document.addEventListener("click",e=>{
     triage:sheetTriage,
     cfilter:()=>{S.ui.cfilter=v;render()},
     pick:()=>sheetPick(el.dataset.d),
+    pickalt:()=>sheetPick(el.dataset.d,true),
+    unalt:()=>{const c={...S.col.plan[el.dataset.d]};delete c.altId;delete c.altName;write("plan",el.dataset.d,c)},
     unplan:()=>write("plan",el.dataset.d,null),
     autofill:()=>{
       const t=today();const used=new Set(Object.entries(S.col.plan).filter(([d])=>d>=t).map(([,p])=>p.mealId));let n=0;
