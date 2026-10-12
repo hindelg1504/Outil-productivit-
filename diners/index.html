@@ -432,22 +432,36 @@ function suggest(n,{time="any",type="all",fridge="",exclude=new Set(),forDate=to
     if(type!=="all"&&m.type!==type) continue;
     const last=st.last[m.id],d=last?daysBetween(last,forDate):null;
     if(d!==null&&d>=0&&d<7) continue;
-    let s={aime:3,essayer:2.3,new:1.5}[m.status]??1;
+    let s={aime:1.2,essayer:1,new:0.8}[m.status]??0.8;
     if(d!==null&&d<14) s-=1.5;
     if(m.season) s+=(m.season===season?0.4:-1.6);
     let hits=[];
     if(words.length){hits=matches(m,words);s+=hits.length?2.4*hits.length:-3}
     if(yType&&m.type===yType) s-=0.8;
-    s+=Math.random()*2.4;
+    s+=Math.random()*3;
     scored.push({m,s});
   }
   scored.sort((a,b)=>b.s-a.s);
-  const res=[],tc={};
-  for(const x of scored){if(res.length>=n)break;if(n>1&&(tc[x.m.type]||0)>=2)continue;tc[x.m.type]=(tc[x.m.type]||0)+1;res.push(x.m.id)}
+  const res=[],tc={};let liked=0;
+  for(const x of scored){if(res.length>=n)break;if(n>1&&(tc[x.m.type]||0)>=2)continue;if(n>1&&x.m.status==="aime"&&liked>=1)continue;
+    tc[x.m.type]=(tc[x.m.type]||0)+1;if(x.m.status==="aime")liked++;res.push(x.m.id)}
   for(const x of scored){if(res.length>=n)break;if(!res.includes(x.m.id))res.push(x.m.id)}
   return res;
 }
-function newPicks(){S.ui.picks=suggest(3,{time:S.ui.time,type:S.ui.type,fridge:S.ui.fridge})}
+const rejKey=()=>"rej:"+today();
+const rejMem={};
+function rejected(){try{return JSON.parse(localStorage.getItem(rejKey())||"[]")}catch(e){return rejMem[rejKey()]||[]}}
+function reject(id){const l=rejected();if(!l.includes(id))l.push(id);rejMem[rejKey()]=l;try{localStorage.setItem(rejKey(),JSON.stringify(l))}catch(e){}}
+const shown=new Set();
+function tonightPicks(n,extra=[]){
+  const opts={time:S.ui.time,type:S.ui.type,fridge:S.ui.fridge};
+  const base=[...rejected(),...extra];
+  let r=suggest(n,{...opts,exclude:new Set([...shown,...base])});
+  if(r.length<n){shown.clear();r=suggest(n,{...opts,exclude:new Set(base)})}
+  r.forEach(id=>shown.add(id));
+  return r;
+}
+function newPicks(){S.ui.picks=tonightPicks(3)}
 
 /* ---------- Écriture (une écriture à la fois par document) ---------- */
 const queues={};
@@ -796,8 +810,8 @@ document.addEventListener("click",e=>{
     settings:sheetSettings,
     ftime:()=>{S.ui.time=v;S.ui.touched=true;newPicks();render()},
     ftype:()=>{S.ui.type=v;S.ui.touched=true;newPicks();render()},
-    reroll:()=>{S.ui.touched=true;const old=new Set(S.ui.picks||[]);S.ui.picks=suggest(3,{time:S.ui.time,type:S.ui.type,fridge:S.ui.fridge,exclude:old});if(S.ui.picks.length<3)newPicks();render()},
-    swap:()=>{S.ui.touched=true;const ex=new Set(S.ui.picks);const n=suggest(1,{time:S.ui.time,type:S.ui.type,fridge:S.ui.fridge,exclude:ex})[0];S.ui.picks=n?S.ui.picks.map(x=>x===id?n:x):S.ui.picks.filter(x=>x!==id);render()},
+    reroll:()=>{S.ui.touched=true;S.ui.picks=tonightPicks(3,S.ui.picks||[]);render()},
+    swap:()=>{S.ui.touched=true;reject(id);const n=tonightPicks(1,S.ui.picks)[0];S.ui.picks=n?S.ui.picks.map(x=>x===id?n:x):S.ui.picks.filter(x=>x!==id);render()},
     eat:()=>{logMeal(today(),byId(id));render();scrollTo({top:0,behavior:"smooth"});toast("Bon appétit ! C'est noté. 😋")},
     plan:()=>sheetPlanFor(id),
     open:()=>sheetDetail(id),
