@@ -799,6 +799,52 @@ function sheetSettings(){
 }
 let sheetActions={};
 
+/* ---------- Claude ---------- */
+async function askClaude(){
+  const liked=catalog().filter(m=>m.status==="aime"&&m.name).map(m=>m.name).slice(0,30);
+  const avoid=avoidList();
+  const porkNote=avoid.some(w=>norm(w)==="porc")?" (donc aucun lardon, jambon de porc, chorizo, saucisson, lard, saucisse de porc ni gélatine de porc)":"";
+  const time=S.ui.time==="any"?"pas de limite stricte (moins d'une heure)":S.ui.time+" minutes maximum";
+  const type={all:"peu importe",v:"végétarien",p:"poisson ou fruits de mer",m:"viande (hors porc)"}[S.ui.type];
+  const prompt=`Tu aides une famille de ${people()} personnes en France à choisir un dîner de semaine simple.
+Ingrédients disponibles : ${S.ui.fridge.trim()||"non précisé, propose des ingrédients courants"}.
+Temps de préparation et cuisson : ${time}.
+Type de plat souhaité : ${type}.
+À ne jamais utiliser : ${avoid.join(", ")}${porkNote}.
+Plats qu'ils aiment déjà (pour cerner leurs goûts, ne pas les reproposer) : ${liked.join(" ; ")||"non renseigné"}.
+Propose 3 idées différentes, faisables par un cuisinier amateur, avec des ingrédients de supermarché.
+Réponds uniquement avec ce JSON : {"ideas":[{"name":"Nom du plat","time":25,"type":"v","ingredients":["300 g de riz","..."],"steps":["...","..."]}]}
+"type" vaut "v" (végétarien), "p" (poisson) ou "m" (viande). Quantités pour ${people()} personnes. 3 à 5 étapes courtes en français.`;
+  S.ui.ai={loading:true};render();
+  try{
+    const r=await sample.json(prompt);
+    const ideas=(r&&Array.isArray(r.ideas)?r.ideas:[]).filter(x=>x&&x.name).slice(0,3);
+    S.ui.ai=ideas.length?{ideas}:{error:"Claude n'a pas renvoyé d'idée exploitable. Réessaie."};
+  }catch(e){
+    S.ui.ai={error:e?.code==="not_granted"?"Tu n'as pas autorisé la page à interroger Claude.":e?.code==="rate_limited"?"Trop de demandes d'un coup. Attends une minute.":"Claude n'a pas pu répondre. Réessaie."};
+  }
+  render();
+}
+function saveAiIdea(i){
+  const x=S.ui.ai.ideas[i];if(x.savedId)return x.savedId;
+  const id=newId();
+  saveMeal(id,{name:x.name,time:+x.time||30,type:TYPES[x.type]?x.type:"",ing:(x.ingredients||[]).map(s=>String(s)),note:(x.steps||[]).map((s,k)=>`${k+1}. ${s}`).join("\n"),status:"essayer",createdAt:Date.now()});
+  x.saved=true;x.savedId=id;return id;
+}
+
+/* ---------- Courses ---------- */
+function addWeekToShop(){
+  const t=today(),cat=catalog(),list=S.col.shopping.list?.items||[];
+  const have=new Set(list.map(i=>norm(i.text)));
+  const map=new Map();
+  for(let i=0;i<7;i++){const p=S.col.plan[addDays(t,i)];if(!p)continue;const m=cat.find(c=>c.id===p.mealId);if(!m)continue;
+    for(const ing of m.ing){const k=norm(ing);if(have.has(k))continue;if(!map.has(k))map.set(k,{text:ing,for:[]});map.get(k).for.push(m.name)}}
+  if(!map.size){toast(Object.keys(S.col.plan).some(d=>d>=t)?"Tout est déjà sur la liste.":"Planifie d'abord quelques soirs dans l'onglet Semaine.");return false}
+  const items=[...list.map(i=>({...i})),...[...map.values()].map(v=>({id:newId(),text:v.text,done:false,for:v.for.join(", ")}))];
+  write("shopping","list",{items});toast(`${map.size} article(s) ajouté(s)`);return true;
+}
+function setItems(fn){const items=(S.col.shopping.list?.items||[]).map(i=>({...i}));write("shopping","list",{items:fn(items)})}
+
 /* ---------- Évènements ---------- */
 document.addEventListener("click",e=>{
   const el=e.target.closest("[data-act]");if(!el)return;
@@ -847,6 +893,9 @@ document.addEventListener("click",e=>{
         const pick=suggest(1,{time:wd>=1&&wd<=4?"35":"any",exclude:used,forDate:d})[0];if(!pick)continue;used.add(pick);const m=byId(pick);write("plan",d,{mealId:m.id,name:m.name});n++}
       toast(n?`${n} soir(s) rempli(s). Touche un plat pour le changer.`:"La semaine est déjà remplie.")},
     toshop:()=>{if(addWeekToShop()){S.ui.tab="shop";render()}},
+    ai:askClaude,
+    aisave:()=>{saveAiIdea(+el.dataset.i);render();toast("Ajouté au catalogue, rubrique « À essayer » 🌸")},
+    aieat:()=>{const i=+el.dataset.i,x=S.ui.ai.ideas[i],mid=saveAiIdea(i);logMeal(today(),{id:mid,name:x.name,status:"essayer"});render();scrollTo({top:0,behavior:"smooth"});toast("Bon appétit ! La recette est dans le catalogue. 😋")},
     cleardone:()=>setItems(it=>it.filter(i=>!i.done)),
     clearshop:()=>{el.outerHTML=`<span class="row"><span class="small">Vider toute la liste ?</span><button class="btn danger" data-act="clearshopyes">Oui</button><button class="btn ghost" data-act="tab" data-v="shop">Non</button></span>`},
     clearshopyes:()=>write("shopping","list",{items:[]}),
