@@ -119,8 +119,8 @@ textarea{min-height:80px;resize:vertical}
 .shop .done .t{text-decoration:line-through;color:var(--muted)}
 
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
-nav.tabs .in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
-nav.tabs button{border:0;background:none;border-radius:10px;padding:8px 4px;font-size:13px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px}
+nav.tabs .in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:2px}
+nav.tabs button{border:0;background:none;border-radius:10px;padding:8px 2px;font-size:12px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px}
 nav.tabs button svg{width:22px;height:22px}
 nav.tabs button[aria-current="page"]{color:var(--accent);background:var(--accent-soft)}
 
@@ -358,17 +358,10 @@ const LIB=[
 ["Sandwich pois chiches et concombre",15,"v","pain|houmous|pois chiches|concombre|salade verte","","lib-f102"],
 ["Wrap omelette et épinards",15,"v","œufs|épinards|tortillas|fromage frais","","lib-f103"],
 ["Hachis parmentier végétarien",50,"v","lentilles vertes|carottes|pommes de terre|lait|fromage râpé","h","lib-f104"],
-["Poulet yassa et riz",50,"m","poulet|oignons|citron|moutarde|riz","","lib-g0"],
-["Bœuf aux carottes",90,"m","bœuf à mijoter|carottes|oignons|vin blanc|thym|pommes de terre","h","lib-g1"],
-["Bò bún au bœuf",30,"m","bœuf émincé|vermicelles de riz|salade verte|carottes|cacahuètes|nems de poulet","e","lib-g2"],
-["Enchiladas au poulet",40,"m","tortillas|poulet|haricots rouges|sauce tomate|fromage râpé|crème fraîche","","lib-g3"],
-["Poulet tandoori et riz basmati",35,"m","poulet|yaourt nature|épices tandoori|riz basmati|concombre","","lib-g4"],
-["Fish and chips",40,"p","filets de cabillaud|farine|bière|pommes de terre|petits pois","","lib-g5"],
-["Colin au citron et purée de carottes",30,"p","filets de colin|citron|carottes|pommes de terre|beurre","","lib-g6"],
-["Okonomiyaki",25,"v","chou blanc|œufs|farine|oignons nouveaux|mayonnaise|sauce soja","","lib-g7"],
-["Soupe de pois cassés et croûtons",50,"v","pois cassés|carottes|oignon|bouillon de légumes|pain","h","lib-g8"],
-["Gratin de butternut au chèvre",45,"v","butternut|chèvre|crème fraîche|fromage râpé|salade verte","h","lib-g9"]
+["Tacos français maison",35,"m","galettes de blé|bœuf haché|pommes de terre|crème fraîche|fromage râpé|oignon","","lib-h0"],
+["Seffa au poulet",50,"m","vermicelles fins|poulet|oignons|amandes|cannelle|sucre glace|beurre","","lib-h1"]
 ];
+const PANTRY=[["🥕","Légumes","ail|oignons|oignons rouges|échalotes|carottes|pommes de terre|patates douces|courgettes|aubergines|poivrons|tomates|tomates cerises|concombre|salade verte|mâche|roquette|épinards|brocoli|chou-fleur|chou blanc|haricots verts|petits pois|poireaux|champignons|butternut|potimarron|céleri|fenouil|navets|radis|betteraves|maïs|avocats|endives|asperges|artichauts|persil|coriandre|basilic|menthe|ciboulette|aneth|citrons|citrons verts|gingembre"],["🍎","Fruits","pommes|poires|bananes|oranges|clémentines|kiwis|raisin|fraises|framboises|myrtilles|melon|pastèque|pêches|abricots|prunes|ananas|mangue|figues|dattes|fruits secs"],["🍗","Viandes","poulet entier|blancs de poulet|cuisses de poulet|poulet haché|escalopes de dinde|jambon de dinde|dinde fumée|steaks hachés|bœuf haché|bœuf émincé|bœuf à mijoter|rôti de bœuf|veau|agneau|merguez|saucisses de volaille|cordons bleus de volaille|nuggets de poulet"],["🐟","Poissons","saumon|saumon fumé|cabillaud|colin|truite|maquereau|sardines|dorade|thon frais|crevettes|moules|calamars|surimi|poisson pané"],["🥚","Crèmerie","œufs|lait|beurre|crème fraîche|crème liquide|yaourts nature|yaourts aux fruits|fromage blanc|petits-suisses|lait de coco|lait végétal"],["🧀","Fromages","emmental râpé|mozzarella|parmesan|comté|cheddar|feta|chèvre|camembert|brie|raclette|reblochon|ricotta|Boursin|fromage frais|Kiri|Babybel|halloumi|mascarpone|bleu"],["🍝","Féculents","pâtes|spaghetti|coquillettes|tagliatelles|lasagnes|gnocchis|ravioles|riz|riz basmati|riz arborio|semoule|quinoa|boulgour|lentilles vertes|lentilles corail|pois chiches|haricots rouges|haricots blancs|vermicelles|nouilles|farine|chapelure|purée en flocons"],["🥫","Conserves & épicerie","thon en boîte|sardines en boîte|maquereau en boîte|tomates concassées|coulis de tomate|concentré de tomate|maïs en boîte|olives|cornichons|câpres|pesto|sauce tomate|bouillon cube|pâte brisée|pâte feuilletée|pâte à pizza|feuilles de brick|tortillas|galettes de riz|soupe"],["🧂","Épices & sauces","sel|poivre|huile d'olive|huile de tournesol|vinaigre|moutarde|mayonnaise|ketchup|sauce soja|sauce barbecue|miel|cumin|paprika|curry|ras el hanout|cannelle|curcuma|herbes de Provence|thym|laurier|piment|sucre|sucre glace|levure|bicarbonate"],["🥖","Boulangerie","baguette|pain de mie|pain complet|pains burger|pains pita|brioche|croissants|biscottes|pain suédois"],["🧊","Surgelés","légumes surgelés|épinards surgelés|haricots verts surgelés|petits pois surgelés|frites|poisson surgelé|crevettes surgelées|pizza surgelée|glaces|fruits rouges surgelés"],["🍪","Petit-déj & sucré","café|thé|chocolat en poudre|céréales|flocons d'avoine|confiture|pâte à tartiner|compotes|biscuits|chocolat|gâteaux|amandes|noix|cacahuètes"],["🥤","Boissons","eau|eau gazeuse|jus d'orange|sirop|soda|lait|vin"],["🧴","Maison & hygiène","papier toilette|essuie-tout|liquide vaisselle|pastilles lave-vaisselle|lessive|adoucissant|éponges|sacs poubelle|papier aluminium|film alimentaire|savon|gel douche|shampooing|dentifrice|déodorant|mouchoirs|cotons"]];
 const TYPES={v:"Végé",p:"Poisson",m:"Viande"};
 const STATUS={aime:"On aime",essayer:"À essayer",new:"À trier",non:"Pas pour nous"};
 const DEFAULT_AVOID=["porc","polenta"];
@@ -377,7 +370,7 @@ const DEFAULT_AVOID=["porc","polenta"];
 const S={
   col:{meals:{},log:{},plan:{},shopping:{},settings:{}},
   ready:false, noDb:false,
-  ui:{tab:"tonight",time:"any",type:"all",fridge:"",picks:null,cfilter:"all",q:"",ai:null,touched:false}
+  ui:{tab:"tonight",pcat:0,pq:"",time:"any",type:"all",fridge:"",picks:null,cfilter:"all",q:"",ai:null,touched:false}
 };
 let db=null, assets=null, sample=null;
 
@@ -502,9 +495,10 @@ const ICONS={
   tonight:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="13" r="7"/><path d="M12 13h.01M3 4v6a2 2 0 0 0 2 2M5 4v16M21 4c-1.5 0-2.5 2-2.5 5s1 3 2.5 3v8"/></svg>',
   catalog:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5z"/><path d="M4 19a2 2 0 0 1 2-2h13v4H6a2 2 0 0 1-2-2zM9 7h6M9 11h4"/></svg>',
   week:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M7 14h3M7 17h6"/></svg>',
+  pantry:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18l-2 11H5L3 9z"/><path d="M8 9l3-6M16 9l-3-6M9 13v4M15 13v4M12 13v4"/></svg>',
   shop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1 1 2-2M3.5 12l1 1 2-2M3.5 18l1 1 2-2"/></svg>'
 };
-const TABS=[["tonight","Ce soir"],["catalog","Catalogue"],["week","Semaine"],["shop","Courses"]];
+const TABS=[["tonight","Ce soir"],["catalog","Catalogue"],["week","Semaine"],["pantry","Produits"],["shop","Courses"]];
 function renderTabs(){
   const n=(S.col.shopping.list?.items||[]).filter(i=>!i.done).length;
   $("#tabs").innerHTML=TABS.map(([k,l])=>`<button data-act="tab" data-v="${k}" ${S.ui.tab===k?'aria-current="page"':""}>${ICONS[k]}<span>${l}${k==="shop"&&n?` (${n})`:""}</span></button>`).join("");
@@ -515,7 +509,7 @@ function render(fromSnapshot){
   if(fromSnapshot&&a&&$("#main").contains(a)&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)){pendingRender=true;return}
   pendingRender=false;
   renderTabs();
-  const v={tonight:vTonight,catalog:vCatalog,week:vWeek,shop:vShop}[S.ui.tab]();
+  const v={tonight:vTonight,catalog:vCatalog,week:vWeek,pantry:vPantry,shop:vShop}[S.ui.tab]();
   $("#main").innerHTML=v;
 }
 document.addEventListener("focusout",()=>setTimeout(()=>{if(pendingRender)render()},0));
@@ -670,6 +664,28 @@ function vWeek(){
   h+=hist.length?`<div class="list">${hist.map(l=>`<div class="item day"><span class="d">${esc(dayShort(l.date))}</span><span class="txt"><span class="t">${esc(l.name)}</span></span></div>`).join("")}</div>`
     :`<div class="card muted small">L'historique se remplit quand tu notes ce que vous avez mangé (bouton « On mange ça » ou question « hier soir ? »).</div>`;
   return h+`</section>`;
+}
+
+/* --- Onglet Produits --- */
+function vPantry(){
+  const items=S.col.shopping.list?.items||[];
+  const inList=new Set(items.filter(i=>!i.done).map(i=>norm(i.text)));
+  let h=header("Produits 🧺");
+  h+=`<p class="muted small" style="margin:0">Touche un produit pour l'ajouter à ta liste de courses, touche-le à nouveau pour le retirer.</p>`;
+  h+=`<div class="field"><label for="psq">Chercher un produit</label><input id="psq" type="search" value="${esc(S.ui.pq)}" placeholder="ex. crème, riz, lessive" autocomplete="off"></div>`;
+  const q=norm(S.ui.pq).trim();
+  const chip=x=>`<button class="chip" data-act="ptoggle" data-v="${esc(x)}" aria-pressed="${inList.has(norm(x))}">${inList.has(norm(x))?"✓ ":""}${esc(x)}</button>`;
+  if(q){
+    const hits=PANTRY.flatMap(([,,l])=>l.split("|")).filter((x,i,a)=>a.indexOf(x)===i&&norm(x).includes(q));
+    h+=hits.length?`<div class="chips">${hits.map(chip).join("")}</div>`:`<div class="card muted small">Aucun produit trouvé. Ajoute-le directement depuis l'onglet Courses.</div>`;
+  }else{
+    h+=`<div class="chips">${PANTRY.map(([e,n],i)=>`<button class="chip" data-act="pcat" data-v="${i}" aria-pressed="${S.ui.pcat===i}">${e} ${esc(n)}</button>`).join("")}</div>`;
+    const [e,n,l]=PANTRY[S.ui.pcat];
+    h+=`<section class="panel"><h2>${e} ${esc(n)}</h2><div class="chips">${l.split("|").map(chip).join("")}</div></section>`;
+  }
+  const n=items.filter(i=>!i.done).length;
+  h+=`<button class="btn big primary" data-act="tab" data-v="shop">Voir ma liste de courses${n?` (${n})`:""}</button>`;
+  return h;
 }
 
 /* --- Onglet Courses --- */
@@ -906,6 +922,10 @@ document.addEventListener("click",e=>{
     ai:askClaude,
     aisave:()=>{saveAiIdea(+el.dataset.i);render();toast("Ajouté au catalogue, rubrique « À essayer » 🌸")},
     aieat:()=>{const i=+el.dataset.i,x=S.ui.ai.ideas[i],mid=saveAiIdea(i);logMeal(today(),{id:mid,name:x.name,status:"essayer"});render();scrollTo({top:0,behavior:"smooth"});toast("Bon appétit ! La recette est dans le catalogue. 😋")},
+    pcat:()=>{S.ui.pcat=+v;render()},
+    ptoggle:()=>{const k=norm(v),it=S.col.shopping.list?.items||[];
+      if(it.some(i=>!i.done&&norm(i.text)===k)){setItems(a=>a.filter(i=>i.done||norm(i.text)!==k));toast(`${v} retiré de la liste`)}
+      else{setItems(a=>[...a.filter(i=>norm(i.text)!==k),{id:newId(),text:v,done:false}]);toast(`${v} ajouté à la liste 🛒`)}},
     cleardone:()=>setItems(it=>it.filter(i=>!i.done)),
     clearshop:()=>{el.outerHTML=`<span class="row"><span class="small">Vider toute la liste ?</span><button class="btn danger" data-act="clearshopyes">Oui</button><button class="btn ghost" data-act="tab" data-v="shop">Non</button></span>`},
     clearshopyes:()=>write("shopping","list",{items:[]}),
@@ -922,6 +942,7 @@ document.addEventListener("change",e=>{
 document.addEventListener("input",e=>{
   const t=e.target;
   if(t.id==="fridge") S.ui.fridge=t.value;
+  if(t.id==="psq"){S.ui.pq=t.value;const pos=t.selectionStart;render();const n=$("#psq");n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}}
   if(t.id==="csearch"){S.ui.q=t.value;const pos=t.selectionStart;render();const n=$("#csearch");n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}}
 });
 document.addEventListener("keydown",e=>{
