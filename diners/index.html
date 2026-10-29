@@ -669,10 +669,20 @@ function vCatalog(){
   list.sort((a,b)=>(order[a.status]-order[b.status])||((st.count[b.id]||0)-(st.count[a.id]||0))||a.name.localeCompare(b.name,"fr"));
   const fchips=[["all","Tout"],["aime","On aime"],["essayer","À essayer"],["new","À trier"],["non","Pas pour nous"]];
   if(counts.noname) fchips.push(["noname","Photos à nommer"]);
+  const kp=kidsPool();counts.kids=kp.length;fchips.push(["kids","👶 Enfant"]);
   let h=header("Mon catalogue 📖");
   h+=`<div class="row"><button class="btn primary" data-act="add">Ajouter un plat</button>${counts.new?`<button class="btn" data-act="triage">Trier les idées (${counts.new})</button>`:""}</div>`;
   h+=`<div class="field"><label for="csearch">Chercher un plat ou un ingrédient</label><input id="csearch" type="search" value="${esc(S.ui.q)}" placeholder="ex. poulet, courgette" autocomplete="off"></div>`;
   h+=`<div class="chips">${fchips.map(([v,l])=>`<button class="chip" data-act="cfilter" data-v="${v}" aria-pressed="${f===v}">${l}<span class="n">${counts[v]||0}</span></button>`).join("")}</div>`;
+  if(f==="kids"){
+    const kl=q?kp.filter(k=>norm(k.name+" "+k.ing.join(" ")).includes(q)):kp;
+    h+=`<p class="small muted" style="margin:0">Plats doux pour un enfant de 2 ans et demi. Touche « Ingrédients et conseil » pour les détails.</p>`;
+    h+=kl.length?["m","p","v"].map(t=>{const l=kl.filter(k=>k.type===t);return l.length?`<span class="lbl">${TYPES[t]}</span><div class="stack">${l.map(kidCard).join("")}</div>`:""}).join("")
+      :`<div class="card muted">Aucune idée enfant ne correspond.</div>`;
+    const n=kidsHidden().length;
+    if(n) h+=`<button class="linkbtn small" data-act="kunhide">Réafficher les ${n} idée(s) retirée(s)</button>`;
+    return h;
+  }
   h+=list.length?`<div class="list">${list.map(m=>`<button class="item" data-act="open" data-id="${m.id}">
       ${m.photo?`<img class="th" src="${photoUrl(m.photo)}" alt="">`:`<span class="th"><i class="dot ${m.type}"></i></span>`}
       <span class="txt"><span class="t">${m.name?esc(m.name):'<em class="muted">Plat à nommer</em>'}</span>${metaLine(m,st)}</span>
@@ -968,6 +978,7 @@ document.addEventListener("click",e=>{
     kall:sheetKids,
     kshop:()=>kidShop(id),
     khide:()=>kidHide(id),
+    kunhide:()=>write("settings","kids",{hidden:[]}),
     pcat:()=>{S.ui.pcat=+v;render()},
     ptoggle:()=>{const k=norm(v),it=S.col.shopping.list?.items||[];
       if(it.some(i=>!i.done&&norm(i.text)===k)){setItems(a=>a.filter(i=>i.done||norm(i.text)!==k));toast(`${v} retiré de la liste`)}
